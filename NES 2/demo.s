@@ -1,5 +1,5 @@
 ;Noel Vargas Padilla 802-19-7297
-;Keiven Soto 902-19-3707
+;Keiven Soto 802-19-3707
 
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
@@ -18,6 +18,11 @@
 
 ; "nes" linker config requires a STARTUP section, even if it's empty
 .segment "STARTUP"
+
+.segment "ZEROPAGE"
+direction: .res 1
+animState: .res 1
+
 
 ; Main code segment for the program
 .segment "CODE"
@@ -58,18 +63,27 @@ clear_memory:
 vblankwait2:
   bit PPUSTATUS
   bpl vblankwait2
-
 .export main
 main:
+
+    clear_OAM:
+    ldx #0
+    loop_clear_oam:
+      lda #$ff ; load byte x of sprite list
+      sta OAMDATA ; 
+      inx
+      cpx #255
+      bne loop_clear_oam
+
   load_sprites:
-    lda PPUSTATUS
-    lda #$00
+    lda PPUSTATUS ; Check PPUSTATUS
+    lda #$00 ; Start @ OAMADDR 0
     sta OAMADDR
 
     ldx #0
     loop_load_sprites:
-      lda sprites, X
-      sta OAMDATA
+      lda sprites, X ; load byte x of sprite list
+      sta OAMDATA ; 
       inx
       cpx #64
       bne loop_load_sprites
@@ -122,31 +136,29 @@ palettes:
 
 
 sprites:
-
 ; tank face up
-.byte $00, $02, $00, $10
-.byte $00, $03, $00, $18
-.byte $08, $12, $00, $10
-.byte $08, $13, $00, $18
+.byte $00, $02, $00, $00
+.byte $00, $03, $00, $08
+.byte $08, $12, $00, $00
+.byte $08, $13, $00, $08
 
 ; tank moving up
-.byte $00, $04, $00, $20
-.byte $00, $05, $00, $28
-.byte $08, $14, $00, $20
-.byte $08, $15, $00, $28
+.byte $00, $04, $00, $10
+.byte $00, $05, $00, $18
+.byte $08, $14, $00, $10
+.byte $08, $15, $00, $18
 
 ; tank looking down
-.byte $00, $06, $00, $30
-.byte $00, $07, $00, $38
-.byte $08, $16, $00, $30
-.byte $08, $17, $00, $38
+.byte $00, $06, $00, $20
+.byte $00, $07, $00, $28
+.byte $08, $16, $00, $20
+.byte $08, $17, $00, $28
 
 ; tank moving down
-.byte $00, $08, $00, $40
-.byte $00, $09, $00, $48
-.byte $08, $18, $00, $40
-.byte $08, $19, $00, $48
-
+.byte $00, $08, $00, $30
+.byte $00, $09, $00, $38
+.byte $08, $18, $00, $30
+.byte $08, $19, $00, $38
 
 ; Character memory
 .segment "CHARS"
