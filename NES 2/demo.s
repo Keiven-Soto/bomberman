@@ -1,4 +1,5 @@
 ;Noel Vargas Padilla 802-19-7297
+;Keiven Soto 902-19-3707
 
 .segment "HEADER"
   ; .byte "NES", $1A      ; iNES header identifier
